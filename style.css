@@ -1,0 +1,88 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: system-ui, Arial, sans-serif;
+  background: #1f2430;
+  color: #eee;
+}
+
+.game {
+  text-align: center;
+  padding: 20px;
+}
+
+h1 { margin: 0 0 14px; }
+
+.controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+select, button {
+  font-size: 15px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background: #2d3345;
+  color: #eee;
+  cursor: pointer;
+}
+
+.status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 20px;
+  background: #2d3345;
+  padding: 8px 14px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+#restart { font-size: 24px; padding: 2px 10px; }
+
+/* The board is a CSS grid; --cols is set from JavaScript */
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 32px);
+  gap: 2px;
+  justify-content: center;
+  user-select: none;
+}
+
+.cell {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 17px;
+  font-weight: bold;
+  border-radius: 4px;
+  border: none;
+  background: #5b6482;
+}
+.cell:hover:not(.revealed) { background: #6f7aa0; }
+
+.cell.revealed { background: #cfd4e3; cursor: default; }
+.cell.mine     { background: #e5e7ef; }
+.cell.exploded { background: #e5484d; }
+.cell.wrong    { background: #f1b0b3; }
+
+/* Number colours */
+.n1 { color: #1e66f5; }
+.n2 { color: #2e9e44; }
+.n3 { color: #d20f39; }
+.n4 { color: #5c2fb8; }
+.n5 { color: #8c3b00; }
+.n6 { color: #0e8f8f; }
+.n7 { color: #222; }
+.n8 { color: #666; }
+
+.message { min-height: 1.4em; font-size: 18px; font-weight: bold; }
+.hint { color: #9aa3bd; font-size: 13px; }

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minesweeper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game">
+    <h1>Minesweeper</h1>
+
+    <div class="controls">
+      <select id="difficulty" aria-label="Difficulty">
+        <option value="easy">Easy (9×9, 10 mines)</option>
+        <option value="medium">Medium (12×12, 25 mines)</option>
+        <option value="hard">Hard (16×16, 40 mines)</option>
+      </select>
+      <button id="flagMode" type="button">🚩 Flag mode: off</button>
+    </div>
+
+    <div class="status">
+      <span>💣 <span id="mines">10</span></span>
+      <button id="restart" type="button" aria-label="Restart game">🙂</button>
+      <span>⏱ <span id="timer">0</span></span>
+    </div>
+
+    <div id="board" class="board"></div>
+
+    <p id="message" class="message"></p>
+    <p class="hint">Left click: reveal · Right click: flag (or use Flag mode on phones)</p>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
