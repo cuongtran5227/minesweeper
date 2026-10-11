@@ -3,37 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Minesweeper</title>
-  <meta name="description" content="A simple Minesweeper game you can play in your browser.">
-  <meta name="theme-color" content="#1f2430">
+  <title>Dò mìn thôi!</title>
+  <meta name="description" content="A Minesweeper game with sound, themes, hints and stats. Play it in your browser.">
+  <meta name="theme-color" content="#1f2430" id="themeColor">
   <!-- Tab icon: an SVG emoji icon built into the page, no extra file needed -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231f2430'/><text x='50' y='70' font-size='62' text-anchor='middle'>💣</text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="game">
-    <h1>Minesweeper</h1>
+    <header class="topbar">
+      <h1>💣 Dò mìn by cuongtran</h1>
+      <div class="top-actions">
+        <button id="statsBtn" type="button" aria-label="Statistics" title="Statistics">📊</button>
+        <button id="settingsBtn" type="button" aria-label="Settings" title="Settings">⚙️</button>
+      </div>
+    </header>
 
     <div class="controls">
       <select id="difficulty" aria-label="Difficulty">
-        <option value="easy">Easy (9×9, 10 mines)</option>
-        <option value="medium">Medium (12×12, 25 mines)</option>
-        <option value="hard">Hard (16×16, 40 mines)</option>
+        <option value="easy">Dễ (9×9, 10 mìn)</option>
+        <option value="medium">Thường (12×12, 25 mìn)</option>
+        <option value="hard">Khó (16×16, 40 mìn)</option>
+        <option value="custom">Tùy chỉnh…</option>
       </select>
-      <button id="flagMode" type="button">🚩 Flag mode: off</button>
+      <button id="hintBtn" type="button" title="Reveal a safe square (H)">💡 Gợi ý (3)</button>
+      <button id="flagMode" type="button" title="Toggle flag mode (F)">🚩 Chế độ cờ: tắt</button>
+    </div>
+
+    <div id="customRow" class="custom-row" hidden>
+      <label>Rows <input type="number" id="cRows" min="5" max="24"></label>
+      <label>Cols <input type="number" id="cCols" min="5" max="30"></label>
+      <label>Mines <input type="number" id="cMines" min="1"></label>
+      <button id="applyCustom" type="button">Áp dụng</button>
     </div>
 
     <div class="status">
-      <span>💣 <span id="mines">10</span></span>
-      <button id="restart" type="button" aria-label="Restart game">🙂</button>
-      <span>⏱ <span id="timer">0</span></span>
+      <span class="stat">💣 <span id="mines">10</span></span>
+      <button id="restart" type="button" class="face" aria-label="Restart game" title="New game (R)">🙂</button>
+      <span class="stat">⏱ <span id="timer">0</span></span>
     </div>
 
-    <div id="board" class="board"></div>
+    <div class="board-wrap">
+      <div id="board" class="board"></div>
+    </div>
 
-    <p id="message" class="message"></p>
-    <p class="hint">Left click: reveal · Right click: flag (or use Flag mode on phones)</p>
+    <p id="message" class="message" aria-live="polite"></p>
+    <p id="bestInfo" class="hint"></p>
+    <p class="hint">Chuột trái: bóc · Chuột phải hoặc nhấn giữ: cờ · Nhấp vào số để chord<br>Phím: R khởi động lại · H gợi ý · F chế độ cờ</p>
   </main>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <!-- Settings -->
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+    <h2 id="settingsTitle">⚙️ Cài đặt</h2>
+
+    <section>
+      <h3>Âm Thanh &amp; phản hồi</h3>
+      <label class="row"><span>Hiệu ứng âm thanh</span><input type="checkbox" id="setSound"></label>
+      <label class="row"><span>Âm lượng</span><input type="range" id="setVolume" min="0" max="100"></label>
+      <label class="row"><span>Rung (cho điện thoại)</span><input type="checkbox" id="setVibration"></label>
+    </section>
+
+    <section>
+      <h3>Giao diện</h3>
+      <label class="row">
+        <span>Nền</span>
+        <select id="setTheme">
+          <option value="dark">Tối</option>
+          <option value="light">Sáng</option>
+          <option value="neon">Neon</option>
+        </select>
+      </label>
+      <label class="row"><span>Độ lớn ô <output id="sizeOut"></output></span><input type="range" id="setSize" min="24" max="48"></label>
+      <label class="row"><span>Hoạt ảnh &amp; hiệu ứng</span><input type="checkbox" id="setAnimations"></label>
+    </section>
+
+    <div class="dialog-actions">
+      <button id="resetSettings" type="button">Reset về mặc định</button>
+      <form method="dialog"><button class="primary">Xong</button></form>
+    </div>
+  </dialog>
+
+  <!-- Stats -->
+  <dialog id="statsDialog" aria-labelledby="statsTitle">
+    <h2 id="statsTitle">📊 Thống kê</h2>
+    <table class="stats-table">
+      <tr><th>Trò chơi đã chơi</th><td id="stPlayed">0</td></tr>
+      <tr><th>Trò chơi thắng</th><td id="stWon">0</td></tr>
+      <tr><th>Tỷ lệ thắng</th><td id="stRate">0%</td></tr>
+      <tr><th>Chuỗi thắng hiện tại</th><td id="stStreak">0</td></tr>
+      <tr><th>Chuỗi thắng tốt nhất</th><td id="stBestStreak">0</td></tr>
+      <tr><th>Thời gian tốt nhất – Dễ</th><td id="stBestEasy">–</td></tr>
+      <tr><th>Thời gian tốt nhất – Thường</th><td id="stBestMedium">–</td></tr>
+      <tr><th>Thời gian tốt nhất – Khó</th><td id="stBestHard">–</td></tr>
+    </table>
+    <p class="hint">Kỉ lục chỉ được ghi nhận khi bạn thắng mà không sử dụng gợi ý.</p>
+    <div class="dialog-actions">
+      <button id="resetStats" type="button">Reset số liệu</button>
+      <form method="dialog"><button class="primary">Đóng</button></form>
+    </div>
+  </dialog>
 
   <script src="script.js"></script>
 </body>
